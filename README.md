@@ -54,6 +54,26 @@ faster to obtain result while the Matlab version is easier to
 understand and debug.
 
 
+FAQs
+==
+
+- How to initialize CTW and GTW?
+
+  CTW and GTW can be initialized by any temporal alignment algorithm. In our experiments, CTW, GTW and other iterative time warping methods were initialized by **uniform time warping (UTW)**. Given two sequences of different lengths, UTW uniformly and linearly stretches sequences to align frames. For instance, given two sequences, where `X = [x1, x2, x3]` and `Y = [y1, y2, y3, y4, y5, y6]`, UTW aligns the frames as `{x1, y1, y2}`, `{x2, y3, y4}`, `{x3, y5, y6}`.
+
+- How to set the parameters for CTW and GTW?
+
+  One of the most important parameters for CTW and GTW is the regularization weight `λ` for CCA. This is because without proper regularization, CCA becomes an ill-posed problem in high-dimensional space. I usually set `λ=0.1`. But you might need to tune this parameter for your applications.
+
+- How to use DTW for aligning more than 2 sequences?
+
+  One of the most important parameters for CTW and GTW is the regularization weight `λ` for CCA. This is because without proper regularization, CCA becomes an ill-posed problem in high-dimensional space. I usually set `λ=0.1`. But you might need to tune this parameter for your applications.
+
+- Which functions are implemented in C++?
+
+  For each C++ code, we provide its corresponding Matlab version. For instance, you can use `dtwFordSlow.m` instead of `dtwFord.cpp`. They have the same interface in both input and output. The C++ code is faster to obtain result while the Matlab version is easier to understand and debug.
+
+
 References
 ==
 [1] F. Zhou and F. De la Torre, "Generalized Time Warping for Multi-modal Alignment of Human Motion," in CVPR, 2012.
@@ -79,6 +99,18 @@ Copyright
 ==
 
 This software is free for use in research projects. If you publish results obtained using this software, please use this citation.
+
+    @article{ZhouD16,
+        author = {Feng Zhou and Fernando {De la Torre}},
+        title = {Generalized Canonical Time Warping},
+        journal = {Transactions on Pattern Analysis and Machine Intelligence (PAMI)},
+        year = {2016},
+        volume = {38},
+        number = {2},
+        pages = {279-294},
+    }
+
+(old citation below kept for reference)
 
     @inproceedings{Zhou_2009_6478,
     author = {Feng Zhou and Fernando de la Torre},
