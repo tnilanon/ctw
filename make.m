@@ -7,31 +7,31 @@
 path0 = cd;
 
 cd 'lib/cell';
-mex cellss.cpp;
-mex oness.cpp;
-mex zeross.cpp;
+mex GCC='/usr/bin/gcc-6' cellss.cpp;
+mex GCC='/usr/bin/gcc-6' oness.cpp;
+mex GCC='/usr/bin/gcc-6' zeross.cpp;
 cd(path0);
 
 cd 'lib/text';
-mex atoi.cpp;
-mex atof.cpp;
-mex tokenise.cpp;
+mex GCC='/usr/bin/gcc-6' atoi.cpp;
+mex GCC='/usr/bin/gcc-6' atof.cpp;
+mex GCC='/usr/bin/gcc-6' tokenise.cpp;
 cd(path0);
 
 cd 'lib/img';
-mex maskOver.cpp;
+mex GCC='/usr/bin/gcc-6' maskOver.cpp;
 cd(path0);
 
 cd 'src/ali/dtw';
-mex dtwFord.cpp;
-mex dtwBack.cpp;
-mex dtwFordAsy.cpp;
+mex GCC='/usr/bin/gcc-6' dtwFord.cpp;
+mex GCC='/usr/bin/gcc-6' dtwBack.cpp;
+mex GCC='/usr/bin/gcc-6' dtwFordAsy.cpp;
 cd(path0);
 
 cd 'src/ali/help';
-mex rowBd.cpp;
+mex GCC='/usr/bin/gcc-6' rowBd.cpp;
 cd(path0);
 
 cd 'src/ali/imw';
-mex timewarp.cpp;
+mex GCC='/usr/bin/gcc-6' timewarp.cpp;
 cd(path0);
