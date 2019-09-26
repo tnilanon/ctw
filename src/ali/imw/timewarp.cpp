@@ -4,10 +4,11 @@
 
 void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[ ]) {
 
-    int i, j, n1, n2, k, p, p2, p3, c, dims[3];
+    int i, j, n1, n2, k, p, p2, p3, c;
     double *D, *A, *P, *L;
     double d, v, a;
-    
+    mwSize dims[3];
+
     // input distance matrices
     D = mxGetPr(prhs[0]);
     n1 = mxGetM(prhs[0]);
@@ -22,7 +23,7 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[ ]) {
     A = mxGetPr(plhs[0]);
     P = mxGetPr(plhs[1]);
     L = mxGetPr(plhs[2]);
-    
+
     // initialize
     a = 0;
     for (i = 0; i < n1; ++i) {
@@ -47,7 +48,7 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[ ]) {
             p = j * n1 + i;
             d = D[p];
 //            printf("%.2f\n", d);
-            
+
             if (i == 0 && j == 0) {
                  A[p] = d;
                  P[p] = 0;
@@ -63,7 +64,7 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[ ]) {
                     P[p2] = 1;
                     L[p2] = j;
                 }
-                
+
             } else if (j == 0) {
                 // never happens
 
