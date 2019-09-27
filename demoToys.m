@@ -27,7 +27,7 @@ wsSrc = toyAliSrc(tag, l, m);
 
 %% monotonic basis
 ns = cellDim(Xs, 2);
-bas = baTems(l, ns, 'pol', [3 .4], 'tan', [3 .6 1]); % 2 polynomial and 3 tangent functions
+bas = baTems(l, ns, 'pol', [3 .4], 'tan', [3 .6 1]); % 3 polynomial and 3 tangent functions
 
 %% utw (initialization)
 aliUtw = utw(Xs, bas, aliT);

@@ -39,7 +39,7 @@ XTs = pcas(wsData.XCs, st('d', .9, 'cat', 'y')); % sequences in same feature, us
 %% monotonic basis
 ns = cellDim(Xs, 2);
 l = round(max(ns) * 1.1);
-bas = baTems(l, ns, 'pol', [5 .5], 'tan', [5 1 1]); % 2 polynomial and 3 tangent functions
+bas = baTems(l, ns, 'pol', [5 .5], 'tan', [5 1 1]); % 5 polynomial and 5 tangent functions
 
 %% utw (initialization)
 aliUtw = utw(Xs, bas, []);
