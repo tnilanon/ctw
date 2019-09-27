@@ -61,12 +61,12 @@ for i = 1:n_patients
             visit_a = sprintf('visit_%1d', k);
             for l = 1:2
                 visit_b = sprintf('visit_%1d', l);
-                
+
                 pair_id_arr(m) = {sprintf('%s %s, %s %s', patient_id_a, visit_a, patient_id_b, visit_b)};
 
                 recording_a = struct('patient_id', patient_id_a, 'visit', visit_a);
                 recording_b = struct('patient_id', patient_id_b, 'visit', visit_b);
-                
+
                 indice_a = get_analysis_indice(analysis_indice_task_1_T, recording_a.patient_id, recording_a.visit);
                 indice_b = get_analysis_indice(analysis_indice_task_1_T, recording_b.patient_id, recording_b.visit);
 
@@ -74,7 +74,7 @@ for i = 1:n_patients
                 arr_b = get_data_array(recording_b, skeleton_analysis_feature_list);
 
                 Xs = {arr_a, arr_b};
-                
+
                 % utw (initialization)
                 aliUtw = utw(Xs, [], []);
 
@@ -85,9 +85,9 @@ for i = 1:n_patients
                 aliCtw = ctw(Xs, aliDtw, [], parCtw, parCca, parDtw);
 
                 % compute mae
-                dtw_mae_arr(m) = compute_alignment_mae(aliDtw, indice_a, indice_b);
-                ctw_mae_arr(m) = compute_alignment_mae(aliCtw, indice_a, indice_b);
-                
+                dtw_mae_arr(m) = compute_alignment_mae(aliDtw, indice_a, indice_b, 1, 2);
+                ctw_mae_arr(m) = compute_alignment_mae(aliCtw, indice_a, indice_b, 1, 2);
+
                 if mod(m, 10) == 0
                     fprintf('%4d/%4d\n', m, n_pairs);
                 end
@@ -121,16 +121,16 @@ compute_alignment_mae(t, indice_a, indice_b)
 
 %% get average MAE
 fprintf('\n');
-fprintf('[DTW MAE] begin: %.2f; subtask_2: %.2f; subtask_3: %.2f; end: %.2f\n', ...
+fprintf('[dtw MAE] begin: %.2f; subtask_2: %.2f; subtask_3: %.2f; end: %.2f\n', ...
     mean([dtw_mae_arr.begin]), mean([dtw_mae_arr.subtask_2]), mean([dtw_mae_arr.subtask_3]), mean([dtw_mae_arr.end]));
-fprintf('[DTW MAE] '); eval_pct_mae_within_x_frames(dtw_mae_arr, 15);
-fprintf('[DTW MAE] '); eval_pct_mae_within_x_frames(dtw_mae_arr, 30);
+fprintf('[dtw MAE] '); eval_pct_mae_within_x_frames(dtw_mae_arr, 15);
+fprintf('[dtw MAE] '); eval_pct_mae_within_x_frames(dtw_mae_arr, 30);
 
 fprintf('\n');
-fprintf('[CTW MAE] begin: %.2f; subtask_2: %.2f; subtask_3: %.2f; end: %.2f\n', ...
+fprintf('[ctw MAE] begin: %.2f; subtask_2: %.2f; subtask_3: %.2f; end: %.2f\n', ...
     mean([ctw_mae_arr.begin]), mean([ctw_mae_arr.subtask_2]), mean([ctw_mae_arr.subtask_3]), mean([ctw_mae_arr.end]));
-fprintf('[CTW MAE] '); eval_pct_mae_within_x_frames(ctw_mae_arr, 15);
-fprintf('[CTW MAE] '); eval_pct_mae_within_x_frames(ctw_mae_arr, 30);
+fprintf('[ctw MAE] '); eval_pct_mae_within_x_frames(ctw_mae_arr, 15);
+fprintf('[ctw MAE] '); eval_pct_mae_within_x_frames(ctw_mae_arr, 30);
 
 %% show sequences
 % shAlis2d({aliDtw, aliCtw}, 'legs', {'dtw', 'ctw'});
