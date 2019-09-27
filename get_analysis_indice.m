@@ -1,0 +1,6 @@
+function ret = get_analysis_indice(analysis_indice_T, patient_id, visit)
+
+ret = analysis_indice_T(...
+    strcmp(analysis_indice_T.patient_id, patient_id) & ...
+    strcmp(analysis_indice_T.visit, visit), :);
+
