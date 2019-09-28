@@ -4,7 +4,11 @@ prSet(0); % 0 | 1 | 2 | ...
 %% algorithm parameter
 parDtw = [];
 parPimw = st('lA', 1, 'lB', 1); % IMW: regularization weight
-parCca = st('d', 3, 'lams', .1); % CCA: reduce dimension to keep at least 0.95 energy
+% parCca = st('d', 3, 'lams', .1); % CCA: reduce dimension to keep at least 0.95 energy
+% parCca = st('d', .8, 'lams', .6); % CCA: reduce dimension to keep at least 0.8 energy, set the regularization weight to .6
+% parCca = st('d', 3, 'lams', .1); % best
+% parCca = st('d', .8, 'lams', .6); % worse
+% parCca = st('d', .9, 'lams', .6); % worse
 parPctw = [];
 parGN = st('nItMa', 2, 'inp', 'linear'); % Gauss-Newton: 2 iterations to update the weight in GTW,
 parGtw = st('nItMa', 20);
@@ -88,8 +92,8 @@ gtw_mae_arr = struct( ...
 
 %% monotonic basis
 ns = cellDim(Xs, 2);
-l = round(max(ns) * 1.1);
-bas = baTems(l, ns, 'pol', [5 .5], 'tan', [5 1 1]); % 5 polynomial and 5 tangent functions
+len = round(max(ns) * 1.1);
+bas = baTems(len, ns, 'pol', [5 .5], 'tan', [5 1 1]); % 5 polynomial and 5 tangent functions
 
 %% optimize jointly
 % utw (initialization)
@@ -111,7 +115,7 @@ fprintf('done with pddtw @ %s\n', datetime);
 fprintf('started pimw @ %s\n', datetime);
 aliPimw = pimw(Xs, aliUtw, [], parPimw, parDtw);
 fprintf('done with pimw @ %s\n', datetime);
-
+%%
 % pctw
 fprintf('started pctw @ %s\n', datetime);
 aliPctw = pctw(Xs, aliUtw, [], parPctw, parCca, parDtw);
@@ -132,10 +136,10 @@ fprintf('done with gtw @ %s\n', datetime);
 % done with pddtw @ 27-Sep-2019 06:02:34
 % started pimw @ 27-Sep-2019 06:02:34
 % done with pimw @ 27-Sep-2019 06:09:18
-% started pctw @ 27-Sep-2019 06:09:18
-% done with pctw @ 27-Sep-2019 06:11:53
-% started gtw @ 27-Sep-2019 06:11:53
-% done with gtw @ 27-Sep-2019 06:13:05
+% started pctw @ 27-Sep-2019 07:34:44
+% done with pctw @ 27-Sep-2019 07:37:22
+% started gtw @ 27-Sep-2019 07:37:22
+% done with gtw @ 27-Sep-2019 07:38:43
 
 % save('align_skeleton_jointly.warping_path.2019-09-27-0613.mat', ...
 %     'aliUtw', 'aliPdtw', 'aliPddtw', 'aliPimw', 'aliPctw', 'aliGtw');

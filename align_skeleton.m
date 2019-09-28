@@ -6,6 +6,9 @@ parDtw = [];
 parCca = st('d', .8, 'lams', .6); % CCA: reduce dimension to keep at least 0.8 energy, set the regularization weight to .6
 parCtw = st('debg', 'n');
 
+parGN = st('nItMa', 2, 'inp', 'linear'); % Gauss-Newton: 2 iterations to update the weight in GTW,
+parGtw = st('nItMa', 20);
+
 %% data
 kinect_task_1_analysis_patient_list = { ...
     'P001'; 'P003'; 'P005'; 'P006'; 'P007'; 'P009'; 'P010'; 'P011'; ...
@@ -50,8 +53,14 @@ ctw_mae_arr = struct( ...
     'subtask_2', cell(n_pairs, 1), ...
     'subtask_3', cell(n_pairs, 1), ...
     'end', cell(n_pairs, 1));
+gtw_mae_arr = struct( ...
+    'begin', cell(n_pairs, 1), ...
+    'subtask_2', cell(n_pairs, 1), ...
+    'subtask_3', cell(n_pairs, 1), ...
+    'end', cell(n_pairs, 1));
 
 %% for-looping over pairs of recordings
+fprintf('total %4d: ', n_pairs);
 m = 1;
 for i = 1:n_patients
     patient_id_a = kinect_task_1_analysis_patient_list{i};
@@ -74,22 +83,31 @@ for i = 1:n_patients
                 arr_b = get_data_array(recording_b, skeleton_analysis_feature_list);
 
                 Xs = {arr_a, arr_b};
+                
+                % monotonic basis
+                ns = cellDim(Xs, 2);
+                len = round(max(ns) * 1.1);
+                bas = baTems(len, ns, 'pol', [5 .5], 'tan', [5 1 1]); % 5 polynomial and 5 tangent functions
 
-                % utw (initialization)
-                aliUtw = utw(Xs, [], []);
+                % utw (initialization for Procrustes and gtw)
+                aliUtw = utw(Xs, bas, []);
 
-                % dtw
-                aliDtw = dtw(Xs, [], parDtw);
-
-                % ctw
-                aliCtw = ctw(Xs, aliDtw, [], parCtw, parCca, parDtw);
+%                 % dtw
+%                 aliDtw = dtw(Xs, [], parDtw);
+% 
+%                 % ctw
+%                 aliCtw = ctw(Xs, aliDtw, [], parCtw, parCca, parDtw);
+                
+                % gtw
+                aliGtw = gtw(Xs, bas, aliUtw, [], parGtw, parCca, parGN);
 
                 % compute mae
-                dtw_mae_arr(m) = compute_alignment_mae(aliDtw, indice_a, indice_b, 1, 2);
-                ctw_mae_arr(m) = compute_alignment_mae(aliCtw, indice_a, indice_b, 1, 2);
+%                 dtw_mae_arr(m) = compute_alignment_mae(aliDtw, indice_a, indice_b, 1, 2);
+%                 ctw_mae_arr(m) = compute_alignment_mae(aliCtw, indice_a, indice_b, 1, 2);
+                gtw_mae_arr(m) = compute_alignment_mae_from_float(aliGtw, indice_a, indice_b, 1, 2);
 
                 if mod(m, 10) == 0
-                    fprintf('%4d/%4d\n', m, n_pairs);
+                    fprintf('%4d, ', m);
                 end
                 m = m + 1;
             end
@@ -99,38 +117,44 @@ end
 fprintf('done\n');
 
 %%
-patient_id_a = 'P001';
-patient_id_b = 'P003';
-visit_a = 'visit_1';
-visit_b = 'visit_1';
-recording_a = struct('patient_id', patient_id_a, 'visit', visit_a);
-recording_b = struct('patient_id', patient_id_b, 'visit', visit_b);
-indice_a = get_analysis_indice(analysis_indice_task_1_T, recording_a.patient_id, recording_a.visit);
-indice_b = get_analysis_indice(analysis_indice_task_1_T, recording_b.patient_id, recording_b.visit);
-arr_a = get_data_array(recording_a, skeleton_analysis_feature_list);
-arr_b = get_data_array(recording_b, skeleton_analysis_feature_list);
-Xs = {arr_a, arr_b};
-D = conDst(Xs{1}, Xs{2});
-[v, S] = dtwFord(D);
-P = dtwBack(S);
-t.P = P;
-compute_alignment_mae(t, indice_a, indice_b)
+% patient_id_a = 'P001';
+% patient_id_b = 'P003';
+% visit_a = 'visit_1';
+% visit_b = 'visit_1';
+% recording_a = struct('patient_id', patient_id_a, 'visit', visit_a);
+% recording_b = struct('patient_id', patient_id_b, 'visit', visit_b);
+% indice_a = get_analysis_indice(analysis_indice_task_1_T, recording_a.patient_id, recording_a.visit);
+% indice_b = get_analysis_indice(analysis_indice_task_1_T, recording_b.patient_id, recording_b.visit);
+% arr_a = get_data_array(recording_a, skeleton_analysis_feature_list);
+% arr_b = get_data_array(recording_b, skeleton_analysis_feature_list);
+% Xs = {arr_a, arr_b};
+% D = conDst(Xs{1}, Xs{2});
+% [v, S] = dtwFord(D);
+% P = dtwBack(S);
+% t.P = P;
+% compute_alignment_mae(t, indice_a, indice_b)
 
 %% save results
 % save('2019-09-26-1800.mat', 'pair_id_arr', 'dtw_mae_arr', 'ctw_mae_arr');
 
 %% get average MAE
-fprintf('\n');
-fprintf('[dtw MAE] begin: %.2f; subtask_2: %.2f; subtask_3: %.2f; end: %.2f\n', ...
-    mean([dtw_mae_arr.begin]), mean([dtw_mae_arr.subtask_2]), mean([dtw_mae_arr.subtask_3]), mean([dtw_mae_arr.end]));
-fprintf('[dtw MAE] '); eval_pct_mae_within_x_frames(dtw_mae_arr, 15);
-fprintf('[dtw MAE] '); eval_pct_mae_within_x_frames(dtw_mae_arr, 30);
+% fprintf('\n');
+% fprintf('[dtw MAE] begin: %.2f; subtask_2: %.2f; subtask_3: %.2f; end: %.2f\n', ...
+%     mean([dtw_mae_arr.begin]), mean([dtw_mae_arr.subtask_2]), mean([dtw_mae_arr.subtask_3]), mean([dtw_mae_arr.end]));
+% fprintf('[dtw MAE] '); eval_pct_mae_within_x_frames(dtw_mae_arr, 15);
+% fprintf('[dtw MAE] '); eval_pct_mae_within_x_frames(dtw_mae_arr, 30);
+% 
+% fprintf('\n');
+% fprintf('[ctw MAE] begin: %.2f; subtask_2: %.2f; subtask_3: %.2f; end: %.2f\n', ...
+%     mean([ctw_mae_arr.begin]), mean([ctw_mae_arr.subtask_2]), mean([ctw_mae_arr.subtask_3]), mean([ctw_mae_arr.end]));
+% fprintf('[ctw MAE] '); eval_pct_mae_within_x_frames(ctw_mae_arr, 15);
+% fprintf('[ctw MAE] '); eval_pct_mae_within_x_frames(ctw_mae_arr, 30);
 
 fprintf('\n');
-fprintf('[ctw MAE] begin: %.2f; subtask_2: %.2f; subtask_3: %.2f; end: %.2f\n', ...
-    mean([ctw_mae_arr.begin]), mean([ctw_mae_arr.subtask_2]), mean([ctw_mae_arr.subtask_3]), mean([ctw_mae_arr.end]));
-fprintf('[ctw MAE] '); eval_pct_mae_within_x_frames(ctw_mae_arr, 15);
-fprintf('[ctw MAE] '); eval_pct_mae_within_x_frames(ctw_mae_arr, 30);
+fprintf('[gtw MAE] begin: %.2f; subtask_2: %.2f; subtask_3: %.2f; end: %.2f\n', ...
+    mean([gtw_mae_arr.begin]), mean([gtw_mae_arr.subtask_2]), mean([gtw_mae_arr.subtask_3]), mean([gtw_mae_arr.end]));
+fprintf('[gtw MAE] '); eval_pct_mae_within_x_frames(gtw_mae_arr, 15);
+fprintf('[gtw MAE] '); eval_pct_mae_within_x_frames(gtw_mae_arr, 30);
 
 %% show sequences
 % shAlis2d({aliDtw, aliCtw}, 'legs', {'dtw', 'ctw'});
