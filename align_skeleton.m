@@ -3,7 +3,11 @@ prSet(0); % 0 | 1 | 2 | ...
 
 %% algorithm parameter
 parDtw = [];
-parCca = st('d', .8, 'lams', .6); % CCA: reduce dimension to keep at least 0.8 energy, set the regularization weight to .6
+% parCca = st('d', .8, 'lams', .6); % CCA: reduce dimension to keep at least 0.8 energy, set the regularization weight to .6
+% [gtw MAE] begin: 24.16; subtask_2: 31.45; subtask_3: 33.25; end: 30.85
+% [gtw MAE] (<= 15 frames) begin: 44%; subtask_2: 33%; subtask_3: 31%; end: 31%
+% [gtw MAE] (<= 30 frames) begin: 71%; subtask_2: 59%; subtask_3: 56%; end: 57%
+parCca = st('d', .6, 'lams', .98);
 parCtw = st('debg', 'n');
 
 parGN = st('nItMa', 2, 'inp', 'linear'); % Gauss-Newton: 2 iterations to update the weight in GTW,
@@ -92,27 +96,31 @@ for i = 1:n_patients
                 % utw (initialization for Procrustes and gtw)
                 aliUtw = utw(Xs, bas, []);
 
-%                 % dtw
-%                 aliDtw = dtw(Xs, [], parDtw);
-% 
-%                 % ctw
-%                 aliCtw = ctw(Xs, aliDtw, [], parCtw, parCca, parDtw);
+                % dtw
+                aliDtw = dtw(Xs, [], parDtw);
+
+                % ctw
+                aliCtw = ctw(Xs, aliDtw, [], parCtw, parCca, parDtw);
                 
                 % gtw
                 aliGtw = gtw(Xs, bas, aliUtw, [], parGtw, parCca, parGN);
 
                 % compute mae
-%                 dtw_mae_arr(m) = compute_alignment_mae(aliDtw, indice_a, indice_b, 1, 2);
-%                 ctw_mae_arr(m) = compute_alignment_mae(aliCtw, indice_a, indice_b, 1, 2);
+                dtw_mae_arr(m) = compute_alignment_mae(aliDtw, indice_a, indice_b, 1, 2);
+                ctw_mae_arr(m) = compute_alignment_mae(aliCtw, indice_a, indice_b, 1, 2);
                 gtw_mae_arr(m) = compute_alignment_mae_from_float(aliGtw, indice_a, indice_b, 1, 2);
 
                 if mod(m, 10) == 0
                     fprintf('%4d, ', m);
                 end
                 m = m + 1;
+%                 break
             end
+%             break
         end
+%         break
     end
+%     break
 end
 fprintf('done\n');
 
@@ -138,17 +146,17 @@ fprintf('done\n');
 % save('2019-09-26-1800.mat', 'pair_id_arr', 'dtw_mae_arr', 'ctw_mae_arr');
 
 %% get average MAE
-% fprintf('\n');
-% fprintf('[dtw MAE] begin: %.2f; subtask_2: %.2f; subtask_3: %.2f; end: %.2f\n', ...
-%     mean([dtw_mae_arr.begin]), mean([dtw_mae_arr.subtask_2]), mean([dtw_mae_arr.subtask_3]), mean([dtw_mae_arr.end]));
-% fprintf('[dtw MAE] '); eval_pct_mae_within_x_frames(dtw_mae_arr, 15);
-% fprintf('[dtw MAE] '); eval_pct_mae_within_x_frames(dtw_mae_arr, 30);
-% 
-% fprintf('\n');
-% fprintf('[ctw MAE] begin: %.2f; subtask_2: %.2f; subtask_3: %.2f; end: %.2f\n', ...
-%     mean([ctw_mae_arr.begin]), mean([ctw_mae_arr.subtask_2]), mean([ctw_mae_arr.subtask_3]), mean([ctw_mae_arr.end]));
-% fprintf('[ctw MAE] '); eval_pct_mae_within_x_frames(ctw_mae_arr, 15);
-% fprintf('[ctw MAE] '); eval_pct_mae_within_x_frames(ctw_mae_arr, 30);
+fprintf('\n');
+fprintf('[dtw MAE] begin: %.2f; subtask_2: %.2f; subtask_3: %.2f; end: %.2f\n', ...
+    mean([dtw_mae_arr.begin]), mean([dtw_mae_arr.subtask_2]), mean([dtw_mae_arr.subtask_3]), mean([dtw_mae_arr.end]));
+fprintf('[dtw MAE] '); eval_pct_mae_within_x_frames(dtw_mae_arr, 15);
+fprintf('[dtw MAE] '); eval_pct_mae_within_x_frames(dtw_mae_arr, 30);
+
+fprintf('\n');
+fprintf('[ctw MAE] begin: %.2f; subtask_2: %.2f; subtask_3: %.2f; end: %.2f\n', ...
+    mean([ctw_mae_arr.begin]), mean([ctw_mae_arr.subtask_2]), mean([ctw_mae_arr.subtask_3]), mean([ctw_mae_arr.end]));
+fprintf('[ctw MAE] '); eval_pct_mae_within_x_frames(ctw_mae_arr, 15);
+fprintf('[ctw MAE] '); eval_pct_mae_within_x_frames(ctw_mae_arr, 30);
 
 fprintf('\n');
 fprintf('[gtw MAE] begin: %.2f; subtask_2: %.2f; subtask_3: %.2f; end: %.2f\n', ...

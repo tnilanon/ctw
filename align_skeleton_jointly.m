@@ -1,5 +1,6 @@
-%% set verbosity
+%% settings
 prSet(0); % 0 | 1 | 2 | ...
+datetime.setDefaultFormats('default','yyyy-MM-dd HH:mm:ss')
 
 %% algorithm parameter
 parDtw = [];
@@ -9,6 +10,7 @@ parPimw = st('lA', 1, 'lB', 1); % IMW: regularization weight
 % parCca = st('d', 3, 'lams', .1); % best
 % parCca = st('d', .8, 'lams', .6); % worse
 % parCca = st('d', .9, 'lams', .6); % worse
+parCca = st('d', .6, 'lams', .98);
 parPctw = [];
 parGN = st('nItMa', 2, 'inp', 'linear'); % Gauss-Newton: 2 iterations to update the weight in GTW,
 parGtw = st('nItMa', 20);
@@ -115,7 +117,7 @@ fprintf('done with pddtw @ %s\n', datetime);
 fprintf('started pimw @ %s\n', datetime);
 aliPimw = pimw(Xs, aliUtw, [], parPimw, parDtw);
 fprintf('done with pimw @ %s\n', datetime);
-%%
+
 % pctw
 fprintf('started pctw @ %s\n', datetime);
 aliPctw = pctw(Xs, aliUtw, [], parPctw, parCca, parDtw);
@@ -142,6 +144,8 @@ fprintf('done with gtw @ %s\n', datetime);
 % done with gtw @ 27-Sep-2019 07:38:43
 
 % save('align_skeleton_jointly.warping_path.2019-09-27-0613.mat', ...
+%     'aliUtw', 'aliPdtw', 'aliPddtw', 'aliPimw', 'aliPctw', 'aliGtw');
+% save('align_skeleton_jointly.warping_path.2019-10-02-1623.mat', ...
 %     'aliUtw', 'aliPdtw', 'aliPddtw', 'aliPimw', 'aliPctw', 'aliGtw');
 
 %% debugging
@@ -203,6 +207,8 @@ fprintf('done\n');
 
 %% save results
 % save('align_skeleton_jointly.results.2019-09-26-1800.mat', 'pair_id_arr', ...
+%     'pdtw_mae_arr', 'pddtw_mae_arr', 'pimw_mae_arr', 'pctw_mae_arr', 'gtw_mae_arr');
+% save('align_skeleton_jointly.results.2019-10-02-1623.mat', 'pair_id_arr', ...
 %     'pdtw_mae_arr', 'pddtw_mae_arr', 'pimw_mae_arr', 'pctw_mae_arr', 'gtw_mae_arr');
 
 %% get average MAE

@@ -3,8 +3,8 @@ prSet(0); % 0 | 1 | 2 | ...
 datetime.setDefaultFormats('default','yyyy-MM-dd HH:mm:ss')
 
 %% grid search parameter
-par_cca_d_list = [0.8, 0.85, 0.9, 0.95];
-par_cca_lambda_list = 0.1:0.1:0.9;
+par_cca_d_list = [0.6, 0.7, 0.8];
+par_cca_lambda_list = [0.9, 0.92, 0.94];
 
 %% algorithm parameter
 % parDtw = [];
@@ -138,6 +138,9 @@ for par_cca_d = par_cca_d_list
         end
         fprintf('done\n');
         
+        grid_search_result(idx_result).d = par_cca_d;
+        grid_search_result(idx_result).lambda = par_cca_lambda;
+        
         grid_search_result(idx_result).mae_begin = mean([gtw_mae_arr.begin]);
         grid_search_result(idx_result).mae_subtask_2 = mean([gtw_mae_arr.subtask_2]);
         grid_search_result(idx_result).mae_subtask_3 = mean([gtw_mae_arr.subtask_3]);
@@ -157,17 +160,6 @@ for par_cca_d = par_cca_d_list
         
         idx_result = idx_result + 1;
         fprintf('done @ %s\n', datetime);
-    end
-end
-
-%% forgot to add d and lambda values
-idx_result = 1;
-for par_cca_d = par_cca_d_list
-    for par_cca_lambda = par_cca_lambda_list
-        grid_search_result(idx_result).d = par_cca_d;
-        grid_search_result(idx_result).lambda = par_cca_lambda;
-        
-        idx_result = idx_result + 1;
     end
 end
 
